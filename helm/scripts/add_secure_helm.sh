@@ -49,7 +49,8 @@ openssl x509 -req \
     -CAcreateserial \
     -in tiller.csr.pem \
     -out tiller.cert.pem \
-    -days 365
+    -days 365 \
+    -extfile extfile.cnf
 openssl x509 -req \
     -CA ca.cert.pem \
     -CAkey ca.key.pem \
