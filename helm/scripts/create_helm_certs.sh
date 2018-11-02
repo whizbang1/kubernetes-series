@@ -1,22 +1,10 @@
 #!/usr/bin/env bash
 
-echo "install helm"
-curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
-
-# kubectl --namespace kube-system create sa tiller
-kubectl create -f values/rbac-config.yaml
-
-echo "create tiller namespace"
-kubectl create namespace tiller
-kubectl create serviceaccount tiller --namespace tiller
-kubectl create -f values/role-tiller.yaml
-kubectl create -f values/rolebinding-tiller.yaml
-
 echo "preclean"
 rm ca.* tiller.* helm.*
 
 echo "set key values"
-export SUBJECT="/C=US/ST=Texas/L=Dallas/O=Internet Widgits Pty Ltd/OU=DEVOPS/CN=example.com"
+export SUBJECT="/C=US/ST=Wisconsin/L=Madison/O=ARMS Business Solutions/OU=DEVOPS/CN=armsbusinesssolutions.com"
 
 echo "create certs"
 openssl genrsa -out ca.key.pem 4096
@@ -67,6 +55,7 @@ helm init \
     --tiller-tls-verify \
     --tls-ca-cert ca.cert.pem \
     --service-account tiller
+
 helm repo update
 
 echo "verify helm"
@@ -76,6 +65,13 @@ helm ls \
     --tls-ca-cert ca.cert.pem \
     --tls-cert helm.cert.pem \
     --tls-key helm.key.pem
+
+exit 0
+
+echo "backup any old certs in Helm home"
+readonly backup_dir=$(helm home)/backup-certs/$(date +%Y%m%d%H%M%S)
+mkdir -p "$backup_dir"
+cp $(helm home)/*.pem "$backup_dir"
 
 echo "move certs"
 # you move them so you don't need to include them with every call to helm
