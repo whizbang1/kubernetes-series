@@ -60,3 +60,7 @@ typings/
 .DS_Store
 .idea
 *.iml
+
+# no certs
+**/*.pem
+**/*.srl
